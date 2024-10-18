@@ -1,0 +1,19 @@
+CommLink: Master-Slave Communication Simulator
+CommLink is a Python-based project that simulates real-time data communication between a Master and a Slave device using socket programming. It provides an interactive GUI for sending messages from the Master to the Slave, showcasing the fundamentals of network communication in a visually appealing and user-friendly manner.
+
+Features
+Master-Slave Communication: Send and receive messages between devices using TCP sockets.
+Real-Time Simulation: Observe data exchange and acknowledgment responses in real-time.
+Modern GUI: Dark-themed interface with a sleek, minimalist design.
+Concurrency: Utilizes threading to handle multiple tasks without freezing the interface.
+Message Logs: Displays communication logs for both Master and Slave sections.
+Technologies Used
+Python
+Tkinter for GUI
+Sockets for communication
+Multithreading for concurrent processes
+How to Use
+Clone the repository.
+Run python commlink.py to start the simulation.
+Input a message in the Master section and click Send Message.
+Watch the data flow and interactions between the Master and Slave devices in the logs.
