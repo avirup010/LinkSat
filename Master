@@ -1,0 +1,122 @@
+import socket
+import threading
+import tkinter as tk
+from tkinter import scrolledtext
+from tkinter import font
+
+# Function to handle the slave (server) operations
+def slave_device(slave_text_widget):
+    host = '127.0.0.1'  # Localhost
+    port = 65432        # Port to listen on
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        s.listen()
+        slave_text_widget.insert(tk.END, "Slave device is waiting for connections...\n")
+
+        conn, addr = s.accept()
+        with conn:
+            slave_text_widget.insert(tk.END, f"Connected by {addr}\n")
+            data = conn.recv(1024)
+            received_message = data.decode('utf-8')
+            slave_text_widget.insert(tk.END, f"Received message from Master: {received_message}\n")
+
+            # Respond to the master
+            response = "Acknowledged by Slave"
+            conn.sendall(response.encode('utf-8'))
+            slave_text_widget.insert(tk.END, f"Sent response to Master: {response}\n")
+
+
+# Function to handle the master (client) operations
+def master_device(message, master_text_widget):
+    host = '127.0.0.1'
+    port = 65432
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, port))
+
+        # Send message from input
+        master_text_widget.insert(tk.END, f"Sending message to Slave: {message}\n")
+        s.sendall(message.encode('utf-8'))
+
+        # Receive the response from the slave
+        data = s.recv(1024)
+        master_text_widget.insert(tk.END, f"Received response from Slave: {data.decode('utf-8')}\n")
+
+
+# Function to handle the master message sending from the GUI
+def send_message(master_entry, master_text_widget, slave_text_widget):
+    message = master_entry.get()
+    if message.strip():  # Check if the message is not empty
+        # Run the master_device function in a new thread to avoid freezing the GUI
+        threading.Thread(target=master_device, args=(message, master_text_widget)).start()
+
+        # Start the slave device in a new thread as well
+        threading.Thread(target=slave_device, args=(slave_text_widget,)).start()
+
+
+# Creating the GUI
+def create_gui():
+    window = tk.Tk()
+    window.title("Data Communication Simulation")
+
+    # Set the size and modern pastel background
+    window.geometry("600x600")
+    window.configure(bg="#2C3E50")  # Modern dark pastel background
+
+    # Custom font for labels and buttons
+    custom_font = font.Font(family="Segoe UI", size=14, weight="bold")
+    text_font = font.Font(family="Segoe UI", size=12)
+    developed_font = font.Font(family="Segoe UI", size=12)
+
+    # Frame for layout
+    main_frame = tk.Frame(window, bg="#2C3E50")
+    main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
+    # Title Label
+    title_label = tk.Label(main_frame, text="Data Communication Simulation", font=("Segoe UI", 20), bg="#2C3E50", fg="#ECF0F1")
+    title_label.pack(pady=(10, 20))
+
+    # Master Section
+    master_frame = tk.Frame(main_frame, bg="#2C3E50", bd=2, relief="flat")
+    master_frame.pack(pady=(10, 20), fill=tk.X)
+
+    master_label = tk.Label(master_frame, text="Master Section", font=("Segoe UI", 16), bg="#2C3E50", fg="#ECF0F1")
+    master_label.pack(anchor="w", padx=10, pady=(10, 5))
+
+    master_entry_label = tk.Label(master_frame, text="Enter the message to send:", bg="#2C3E50", fg="#BDC3C7", font=text_font)
+    master_entry_label.pack(anchor="w", padx=10)
+
+    master_entry = tk.Entry(master_frame, width=50, highlightbackground="#34495E", highlightthickness=2, bd=5,
+                            relief='flat', font=text_font, bg="#34495E", fg="#ffffff")
+    master_entry.pack(padx=10, pady=5)
+
+    master_send_button = tk.Button(master_frame, text="Send Message", font=custom_font, bg="#3498DB", fg="#ffffff", 
+                                   relief="flat", activebackground="#2980B9", borderwidth=0,
+                                   command=lambda: send_message(master_entry, master_text_widget, slave_text_widget))
+    master_send_button.pack(pady=(5, 10))
+
+    master_text_widget = scrolledtext.ScrolledText(master_frame, height=8, width=60, bg="#34495E", fg="#ffffff", 
+                                                   relief="flat", font=text_font, highlightthickness=0)
+    master_text_widget.pack(padx=10, pady=10)
+
+    # Slave Section
+    slave_frame = tk.Frame(main_frame, bg="#2C3E50", bd=2, relief="flat")
+    slave_frame.pack(pady=(10, 20), fill=tk.X)
+
+    slave_label = tk.Label(slave_frame, text="Slave Section", font=("Segoe UI", 16), bg="#2C3E50", fg="#ECF0F1")
+    slave_label.pack(anchor="w", padx=10, pady=(10, 5))
+
+    slave_text_widget = scrolledtext.ScrolledText(slave_frame, height=8, width=60, bg="#34495E", fg="#ffffff", 
+                                                  relief="flat", font=text_font, highlightthickness=0)
+    slave_text_widget.pack(padx=10, pady=10)
+
+    # Developed by Avi label (bottom right)
+    developed_by_label = tk.Label(main_frame, text="Developed by Avi", font=developed_font, bg="#2C3E50", fg="#BDC3C7", anchor="e")
+    developed_by_label.pack(side=tk.BOTTOM, anchor="se", pady=(5, 5))  # Bottom-right corner
+
+    window.mainloop()
+
+# Start the GUI
+if __name__ == "__main__":
+    create_gui()
