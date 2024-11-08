@@ -1,5 +1,5 @@
-CommLink: Master-Slave Communication Simulator
-CommLink is a Python-based project that simulates real-time data communication between a Master and a Slave device using socket programming. It provides an interactive GUI for sending messages from the Master to the Slave, showcasing the fundamentals of network communication in a visually appealing and user-friendly manner.
+LinkSat: Master-Slave Communication Simulator
+LinkSat is a Python-based project that simulates real-time data communication between a Master and a Slave device using socket programming. It provides an interactive GUI for sending messages from the Master to the Slave, showcasing the fundamentals of network communication in a visually appealing and user-friendly manner.
 
 Features
 Master-Slave Communication: Send and receive messages between devices using TCP sockets.
